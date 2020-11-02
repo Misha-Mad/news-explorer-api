@@ -9,9 +9,13 @@ module.exports.getArticles = (req, res, next) => {
 };
 
 module.exports.createArticle = (req, res, next) => {
-  const { keyword, title, text, date, source, link, image } = req.body;
+  const {
+    keyword, title, text, date, source, link, image,
+  } = req.body;
   const owner = req.user._id;
-  Articles.create({ keyword, title, text, date, source, link, image, owner })
+  Articles.create({
+    keyword, title, text, date, source, link, image, owner,
+  })
     .then((article) => {
       res.send(article);
     })
@@ -26,7 +30,7 @@ module.exports.deleteArticle = (req, res, next) => {
     .then((article) => {
       const { _id: articleOwnerId } = article.owner;
       if (`${articleOwnerId}` === userId) {
-        Cards.findByIdAndRemove(articleId)
+        Articles.findByIdAndRemove(articleId)
           .then((data) => {
             res.send({ data });
           })

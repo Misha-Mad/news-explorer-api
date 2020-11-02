@@ -2,37 +2,27 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const articleSchema = new mongoose.Schema({
-  keyword : {
+  keyword: {
     type: String,
     required: true,
   },
-  title : {
+  title: {
     type: String,
     required: true,
   },
-  text : {
+  text: {
     type: String,
     required: true,
   },
-  date : {
+  date: {
     type: String,
     required: true,
   },
-  source : {
+  source: {
     type: String,
     required: true,
   },
-  link  : {
-    type: String,
-    required: true,
-    validate: {
-      validator(v) {
-        return validator.isURL(v);
-      },
-      message: 'Нерабочая ссылка',
-    },
-  },
-  image  : {
+  link: {
     type: String,
     required: true,
     validate: {
@@ -42,7 +32,17 @@ const articleSchema = new mongoose.Schema({
       message: 'Нерабочая ссылка',
     },
   },
-  owner  : {
+  image: {
+    type: String,
+    required: true,
+    validate: {
+      validator(v) {
+        return validator.isURL(v);
+      },
+      message: 'Нерабочая ссылка',
+    },
+  },
+  owner: {
     type: String,
     required: true,
     select: false,
