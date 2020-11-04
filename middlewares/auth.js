@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
 const RegAuthError = require('../errors/reg-auth-err');
+const { wrongHeaderMessage, needAuthMessage } = require('../utils/constants');
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new RegAuthError('Ошибка авторизации, неверный заголовок');
+    throw new RegAuthError(wrongHeaderMessage);
   }
   const token = authorization.replace('Bearer ', '');
   let payload;
@@ -14,7 +15,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     return res
       .status(401)
-      .send({ message: 'Необходима авторизация' });
+      .send({ message: needAuthMessage });
   }
   req.user = payload;
   next();

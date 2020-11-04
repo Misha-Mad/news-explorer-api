@@ -1,37 +1,50 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
-const usersRouter = require('./routes/users');
-const articlesRouter = require('./routes/articles');
+const { errors } = require('celebrate');
+const helmet = require('helmet');
+const routes = require('./routes/index');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { validationCreateUser, validationLoginUser } = require('./middlewares/requestValidation');
+const { errorsHandler } = require('./middlewares/errorsHandler');
+const { notFoundResourceMessage } = require('./utils/constants');
+const { limiter } = require('./middlewares/limiter');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect('mongodb://127.0.0.1:27017/newsdb', {
+mongoose.connect(process.env.NODE_ENV === 'production' ? process.env.DB_CONN : 'mongodb://127.0.0.1:27017/newsexplorerdb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
 
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
+app.use(cors());
+app.use(limiter);
 app.use(express.json());
 app.use(requestLogger);
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', validationCreateUser, createUser);
+app.post('/signin', validationLoginUser, login);
 
 app.use(auth);
 
-app.use(usersRouter);
-app.use(articlesRouter);
+app.use(routes);
 app.all('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+  throw new NotFoundError(notFoundResourceMessage);
 });
 
 app.use(errorLogger);
+app.use(errors());
+app.use(errorsHandler);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

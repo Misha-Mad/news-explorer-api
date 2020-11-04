@@ -3,13 +3,14 @@ const jwt = require('jsonwebtoken');
 const Users = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const RegAuthError = require('../errors/reg-auth-err');
+const { notFoundUserMessage, succesfulyRegMessage, regAuthMessage } = require('../utils/constants');
 
 module.exports.getUser = (req, res, next) => {
   const userId = req.user._id;
   Users.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Такого пользователя не существует');
+        throw new NotFoundError(notFoundUserMessage);
       }
       res.send(user);
     })
@@ -28,7 +29,7 @@ module.exports.createUser = (req, res, next) => {
         password: hash,
       })
         .then(() => {
-          res.status(200).send({ message: 'Успешная регистрация' });
+          res.status(200).send({ message: succesfulyRegMessage });
         })
         .catch(next);
     });
@@ -39,7 +40,7 @@ module.exports.login = (req, res, next) => {
   return Users.findUserByCredentials(email, password)
     .then((user) => {
       if (!user.email) {
-        throw new RegAuthError('Неправильные почта или пароль');
+        throw new RegAuthError(regAuthMessage);
       }
       // eslint-disable-next-line no-undef
       const token = jwt.sign({ _id: user._id }, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret', { expiresIn: '7d' });

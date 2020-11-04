@@ -1,7 +1,11 @@
 const Articles = require('../models/article');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
+const { notFoundArticleMessage, forbiddenMessage } = require('../utils/constants');
 
 module.exports.getArticles = (req, res, next) => {
-  Articles.find({}).sort({ date: -1 })
+  const userId = req.user._id;
+  Articles.find({ owner: userId }).sort({ date: -1 })
     .then((articles) => {
       res.send(articles);
     })
@@ -26,15 +30,23 @@ module.exports.deleteArticle = (req, res, next) => {
   const { articleId } = req.params;
   const { _id: userId } = req.user;
   Articles.findById(articleId)
-    .populate('owner')
+    .select('+owner')
     .then((article) => {
-      const { _id: articleOwnerId } = article.owner;
+      if (!article) {
+        throw new NotFoundError(notFoundArticleMessage);
+      }
+      const articleOwnerId = article.owner;
       if (`${articleOwnerId}` === userId) {
         Articles.findByIdAndRemove(articleId)
           .then((data) => {
+            if (!data) {
+              throw new NotFoundError(notFoundArticleMessage);
+            }
             res.send({ data });
           })
           .catch(next);
+      } else {
+        throw new ForbiddenError(forbiddenMessage);
       }
     })
     .catch(next);
