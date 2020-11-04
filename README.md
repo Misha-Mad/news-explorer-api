@@ -13,7 +13,8 @@ ____________________________________________________
 Ссылки:
 1. https://trello.com/b/ZNcxLmvM/%D0%B4%D0%B8%D0%BF%D0%BB%D0%BE%D0%BC
 2. https://github.com/Misha-Mad/news-explorer-api
-3. 
+3. http://api.ne.students.nomoreparties.co
+4. https://www.api.ne.students.nomoreparties.co
 
 
 
