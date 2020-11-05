@@ -13,11 +13,12 @@ const { validationCreateUser, validationLoginUser } = require('./middlewares/req
 const { errorsHandler } = require('./middlewares/errorsHandler');
 const { notFoundResourceMessage } = require('./utils/constants');
 const { limiter } = require('./middlewares/limiter');
+const { DB_CONN_DEV } = require('./utils/config');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect(process.env.NODE_ENV === 'production' ? process.env.DB_CONN : 'mongodb://127.0.0.1:27017/newsexplorerdb', {
+mongoose.connect(process.env.NODE_ENV === 'production' ? process.env.DB_CONN : DB_CONN_DEV, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -47,6 +48,5 @@ app.use(errors());
 app.use(errorsHandler);
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`Express server listening on port ${PORT}`);
 });

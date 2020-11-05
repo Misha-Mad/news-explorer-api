@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const RegAuthError = require('../errors/reg-auth-err');
 const { wrongHeaderMessage, needAuthMessage } = require('../utils/constants');
+const { JWT_SECRET_DEV } = require('../utils/config');
 
-// eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -11,11 +11,9 @@ module.exports = (req, res, next) => {
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
-    payload = jwt.verify(token, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret');
+    payload = jwt.verify(token, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : JWT_SECRET_DEV);
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: needAuthMessage });
+    next(new RegAuthError(needAuthMessage));
   }
   req.user = payload;
   next();
