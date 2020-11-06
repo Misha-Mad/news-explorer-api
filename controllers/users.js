@@ -40,9 +40,9 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
-            next(new ConflictError(uniqueEmailErrorMessage));
+            return next(new ConflictError(uniqueEmailErrorMessage));
           }
-          next(err);
+          return next(err);
         });
     });
 };

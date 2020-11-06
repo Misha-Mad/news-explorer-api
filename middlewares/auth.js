@@ -13,8 +13,8 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : JWT_SECRET_DEV);
   } catch (err) {
-    next(new RegAuthError(needAuthMessage));
+    return next(new RegAuthError(needAuthMessage));
   }
   req.user = payload;
-  next();
+  return next();
 };
