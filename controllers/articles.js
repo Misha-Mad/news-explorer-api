@@ -4,7 +4,8 @@ const ForbiddenError = require('../errors/forbidden-err');
 const { notFoundArticleMessage, forbiddenMessage } = require('../utils/constants');
 
 module.exports.getArticles = (req, res, next) => {
-  Articles.find({}).sort({ date: -1 })
+  const id = req.user._id;
+  Articles.find({ owner: id }).select('+owner').sort({ date: -1 })
     .then((articles) => {
       res.send(articles);
     })
@@ -15,7 +16,7 @@ module.exports.createArticle = (req, res, next) => {
   const {
     keyword, title, text, date, source, link, image,
   } = req.body;
-  const owner = req.user._id;
+  const owner = req.user;
   Articles.create({
     keyword, title, text, date, source, link, image, owner,
   })
